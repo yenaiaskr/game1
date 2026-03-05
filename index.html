@@ -99,24 +99,6 @@ ctx.beginPath();
 ctx.arc(enemy.x,enemy.y,enemy.size,0,Math.PI*2);
 ctx.fill();
 
-/* 暗闇 */
-ctx.fillStyle="rgba(0,0,0,0.6)";
-ctx.fillRect(0,0,600,400);
-
-/* 懐中電灯 */
-let gradient=ctx.createRadialGradient(
-player.x,player.y,20,
-player.x,player.y,140
-);
-
-gradient.addColorStop(0,"rgba(255,255,255,0.9)");
-gradient.addColorStop(1,"rgba(255,255,255,0)");
-
-ctx.fillStyle=gradient;
-ctx.beginPath();
-ctx.arc(player.x,player.y,140,0,Math.PI*2);
-ctx.fill();
-
 }
 
 function gameLoop(){
