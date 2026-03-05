@@ -57,12 +57,12 @@ let keys={};
 document.addEventListener("keydown",e=>keys[e.key]=true);
 document.addEventListener("keyup",e=>keys[e.key]=false);
 
-function collision(x,y){
+function collision(x,y,size){
 for(let t of trees){
 let dx=x-t.x;
 let dy=y-t.y;
 let dist=Math.sqrt(dx*dx+dy*dy);
-if(dist < player.size + t.size){
+if(dist < size + t.size){
 return true;
 }
 }
@@ -79,17 +79,23 @@ if(keys["ArrowDown"]) newY+=3;
 if(keys["ArrowLeft"]) newX-=3;
 if(keys["ArrowRight"]) newX+=3;
 
-if(!collision(newX,newY)){
+if(!collision(newX,newY,player.size)){
 player.x=newX;
 player.y=newY;
 }
 
+/* 敵の移動 */
 let dx=player.x-enemy.x;
 let dy=player.y-enemy.y;
 let dist=Math.sqrt(dx*dx+dy*dy);
 
-enemy.x+=dx/dist*enemy.speed;
-enemy.y+=dy/dist*enemy.speed;
+let nextX=enemy.x + dx/dist*enemy.speed;
+let nextY=enemy.y + dy/dist*enemy.speed;
+
+if(!collision(nextX,nextY,enemy.size)){
+enemy.x=nextX;
+enemy.y=nextY;
+}
 
 if(dist < player.size + enemy.size){
 alert("捕まった...");
