@@ -23,7 +23,7 @@ background:#2f5e2f;
 <body>
 
 <h1>恐怖の森</h1>
-<p>矢印キーで逃げろ。敵に捕まるとゲームオーバー。</p>
+<p>矢印キーで逃げろ</p>
 
 <canvas id="game" width="600" height="400"></canvas>
 
@@ -86,16 +86,23 @@ ctx.beginPath();
 ctx.arc(enemy.x,enemy.y,enemy.size,0,Math.PI*2);
 ctx.fill();
 
-/* 少し暗くする */
-ctx.fillStyle="rgba(0,0,0,0.5)";
+/* 暗闇 */
+ctx.fillStyle="rgba(0,0,0,0.6)";
 ctx.fillRect(0,0,600,400);
 
-/* 懐中電灯（広くして見やすく） */
-ctx.globalCompositeOperation="destination-out";
+/* 白い懐中電灯 */
+let gradient=ctx.createRadialGradient(
+player.x,player.y,20,
+player.x,player.y,140
+);
+
+gradient.addColorStop(0,"rgba(255,255,255,0.9)");
+gradient.addColorStop(1,"rgba(255,255,255,0)");
+
+ctx.fillStyle=gradient;
 ctx.beginPath();
 ctx.arc(player.x,player.y,140,0,Math.PI*2);
 ctx.fill();
-ctx.globalCompositeOperation="source-over";
 
 }
 
