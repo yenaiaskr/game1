@@ -23,7 +23,8 @@ background:#2f5e2f;
 <body>
 
 <h1>恐怖の森</h1>
-<p>矢印キーで逃げろ</p>
+<p>矢印キーで逃げろ（30秒生き残れ）</p>
+<p id="timer">残り時間: 30</p>
 
 <canvas id="game" width="600" height="400"></canvas>
 
@@ -33,6 +34,18 @@ const ctx=canvas.getContext("2d");
 
 let player={x:100,y:200,size:12};
 let enemy={x:500,y:200,size:15,speed:1};
+
+let time=30;
+
+setInterval(()=>{
+time--;
+document.getElementById("timer").textContent="残り時間: "+time;
+
+if(time<=0){
+alert("30秒生き残った！クリア！");
+location.reload();
+}
+},1000);
 
 let trees=[];
 for(let i=0;i<35;i++){
@@ -90,7 +103,7 @@ ctx.fill();
 ctx.fillStyle="rgba(0,0,0,0.6)";
 ctx.fillRect(0,0,600,400);
 
-/* 白い懐中電灯 */
+/* 懐中電灯 */
 let gradient=ctx.createRadialGradient(
 player.x,player.y,20,
 player.x,player.y,140
