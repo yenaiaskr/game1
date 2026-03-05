@@ -6,16 +6,16 @@
 
 <style>
 body{
-    margin:0;
-    background:black;
-    color:white;
-    text-align:center;
-    font-family:sans-serif;
+margin:0;
+background:black;
+color:white;
+text-align:center;
+font-family:sans-serif;
 }
 
 canvas{
-    background:#061306;
-    border:3px solid white;
+border:3px solid white;
+background:#061306;
 }
 </style>
 </head>
@@ -23,23 +23,20 @@ canvas{
 <body>
 
 <h1>恐怖の森</h1>
-<p>矢印キーで逃げろ。敵が追いかけてくる。</p>
+<p>矢印キーで逃げろ。懐中電灯で森を進め。</p>
 
 <canvas id="game" width="600" height="400"></canvas>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
 
 let player={x:100,y:200,size:10};
-let enemy={x:500,y:200,size:15,speed:1.2};
+let enemy={x:500,y:200,size:15,speed:1};
 
 let trees=[];
 for(let i=0;i<40;i++){
-trees.push({
-x:Math.random()*600,
-y:Math.random()*400
-});
+trees.push({x:Math.random()*600,y:Math.random()*400});
 }
 
 let keys={};
@@ -58,8 +55,8 @@ let dx=player.x-enemy.x;
 let dy=player.y-enemy.y;
 let dist=Math.sqrt(dx*dx+dy*dy);
 
-enemy.x += dx/dist*enemy.speed;
-enemy.y += dy/dist*enemy.speed;
+enemy.x+=dx/dist*enemy.speed;
+enemy.y+=dy/dist*enemy.speed;
 
 if(dist < player.size + enemy.size){
 alert("捕まった...");
@@ -70,8 +67,7 @@ location.reload();
 
 function draw(){
 
-ctx.fillStyle="#061306";
-ctx.fillRect(0,0,600,400);
+ctx.clearRect(0,0,600,400);
 
 ctx.fillStyle="#003300";
 trees.forEach(t=>{
@@ -89,6 +85,17 @@ ctx.fillStyle="red";
 ctx.beginPath();
 ctx.arc(enemy.x,enemy.y,enemy.size,0,Math.PI*2);
 ctx.fill();
+
+/* 暗闇 */
+ctx.fillStyle="rgba(0,0,0,0.9)";
+ctx.fillRect(0,0,600,400);
+
+/* 懐中電灯 */
+ctx.globalCompositeOperation="destination-out";
+ctx.beginPath();
+ctx.arc(player.x,player.y,80,0,Math.PI*2);
+ctx.fill();
+ctx.globalCompositeOperation="source-over";
 
 }
 
