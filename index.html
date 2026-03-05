@@ -49,7 +49,7 @@ location.reload();
 
 let trees=[];
 for(let i=0;i<35;i++){
-trees.push({x:Math.random()*600,y:Math.random()*400});
+trees.push({x:Math.random()*600,y:Math.random()*400,size:14});
 }
 
 let keys={};
@@ -57,12 +57,32 @@ let keys={};
 document.addEventListener("keydown",e=>keys[e.key]=true);
 document.addEventListener("keyup",e=>keys[e.key]=false);
 
+function collision(x,y){
+for(let t of trees){
+let dx=x-t.x;
+let dy=y-t.y;
+let dist=Math.sqrt(dx*dx+dy*dy);
+if(dist < player.size + t.size){
+return true;
+}
+}
+return false;
+}
+
 function update(){
 
-if(keys["ArrowUp"]) player.y-=3;
-if(keys["ArrowDown"]) player.y+=3;
-if(keys["ArrowLeft"]) player.x-=3;
-if(keys["ArrowRight"]) player.x+=3;
+let newX=player.x;
+let newY=player.y;
+
+if(keys["ArrowUp"]) newY-=3;
+if(keys["ArrowDown"]) newY+=3;
+if(keys["ArrowLeft"]) newX-=3;
+if(keys["ArrowRight"]) newX+=3;
+
+if(!collision(newX,newY)){
+player.x=newX;
+player.y=newY;
+}
 
 let dx=player.x-enemy.x;
 let dy=player.y-enemy.y;
@@ -85,7 +105,7 @@ ctx.clearRect(0,0,600,400);
 ctx.fillStyle="#1f7a1f";
 trees.forEach(t=>{
 ctx.beginPath();
-ctx.arc(t.x,t.y,14,0,Math.PI*2);
+ctx.arc(t.x,t.y,t.size,0,Math.PI*2);
 ctx.fill();
 });
 
