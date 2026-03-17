@@ -158,9 +158,9 @@ ctx.stroke();
 }
 
 // ライト（中央だけ明るい）
-let g=ctx.createRadialGradient(300,200,50,300,200,300);
-g.addColorStop(0,"rgba(255,255,255,0.3)");
-g.addColorStop(1,"rgba(0,0,0,0.9)");
+let g=ctx.createRadialGradient(300,200,80,300,200,350);
+g.addColorStop(0,"rgba(255,255,255,0.1)");
+g.addColorStop(1,"rgba(0,0,0,0.4)");
 
 ctx.fillStyle=g;
 ctx.fillRect(0,0,600,400);
