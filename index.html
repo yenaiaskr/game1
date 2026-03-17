@@ -2,20 +2,22 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>恐怖の森</title>
+<title>恐怖の森（一人称 強化版）</title>
 
 <style>
 body{
 margin:0;
-background:#222;
+background:black;
 color:white;
 text-align:center;
 font-family:sans-serif;
+overflow:hidden;
 }
 
 canvas{
-border:3px solid white;
-background:#2f5e2f;
+display:block;
+margin:0 auto;
+background:black;
 }
 </style>
 </head>
@@ -23,7 +25,7 @@ background:#2f5e2f;
 <body>
 
 <h1>恐怖の森</h1>
-<p>矢印キーで逃げろ（30秒生き残れ）</p>
+<p>← →：向き / ↑：前進 / 30秒逃げろ</p>
 <p id="timer">残り時間: 30</p>
 
 <canvas id="game" width="600" height="400"></canvas>
@@ -32,108 +34,146 @@ background:#2f5e2f;
 const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
 
-let player={x:100,y:200,size:12};
-let enemy={x:500,y:200,size:15,speed:6};
+let player={x:3,y:3,angle:0};
+let enemy={x:8,y:8,speed:0.03};
+
+let map=[
+[1,1,1,1,1,1,1,1,1,1],
+[1,0,0,0,0,0,0,0,0,1],
+[1,0,1,0,1,0,1,0,0,1],
+[1,0,1,0,0,0,1,0,0,1],
+[1,0,0,0,1,0,0,0,0,1],
+[1,0,1,0,1,0,1,0,0,1],
+[1,0,0,0,0,0,1,0,0,1],
+[1,0,1,0,1,0,0,0,0,1],
+[1,0,0,0,0,0,0,0,0,1],
+[1,1,1,1,1,1,1,1,1,1]
+];
 
 let time=30;
-
 setInterval(()=>{
 time--;
 document.getElementById("timer").textContent="残り時間: "+time;
-
 if(time<=0){
-alert("30秒生き残った！クリア！");
+alert("クリア！");
 location.reload();
 }
 },1000);
 
-let trees=[];
-for(let i=0;i<35;i++){
-trees.push({x:Math.random()*600,y:Math.random()*400,size:14});
-}
-
 let keys={};
-
 document.addEventListener("keydown",e=>keys[e.key]=true);
 document.addEventListener("keyup",e=>keys[e.key]=false);
 
-function collision(x,y,size){
-for(let t of trees){
-let dx=x-t.x;
-let dy=y-t.y;
-let dist=Math.sqrt(dx*dx+dy*dy);
-if(dist < size + t.size){
-return true;
-}
-}
-return false;
-}
-
 function update(){
 
-let newX=player.x;
-let newY=player.y;
+if(keys["ArrowLeft"]) player.angle-=0.05;
+if(keys["ArrowRight"]) player.angle+=0.05;
 
-if(keys["ArrowUp"]) newY-=3;
-if(keys["ArrowDown"]) newY+=3;
-if(keys["ArrowLeft"]) newX-=3;
-if(keys["ArrowRight"]) newX+=3;
+let nx=player.x;
+let ny=player.y;
 
-if(!collision(newX,newY,player.size)){
-player.x=newX;
-player.y=newY;
+if(keys["ArrowUp"]){
+nx+=Math.cos(player.angle)*0.1;
+ny+=Math.sin(player.angle)*0.1;
 }
 
-/* 敵の移動 */
+// 壁判定
+if(map[Math.floor(ny)][Math.floor(nx)]==0){
+player.x=nx;
+player.y=ny;
+}
+
+// 敵追跡
 let dx=player.x-enemy.x;
 let dy=player.y-enemy.y;
 let dist=Math.sqrt(dx*dx+dy*dy);
 
-let nextX=enemy.x + dx/dist*enemy.speed;
-let nextY=enemy.y + dy/dist*enemy.speed;
+enemy.x+=dx*enemy.speed;
+enemy.y+=dy*enemy.speed;
 
-if(!collision(nextX,nextY,enemy.size)){
-enemy.x=nextX;
-enemy.y=nextY;
-}
-
-if(dist < player.size + enemy.size){
+if(dist<0.5){
 alert("捕まった...");
 location.reload();
 }
-
 }
 
 function draw(){
 
-ctx.clearRect(0,0,600,400);
+ctx.fillStyle="black";
+ctx.fillRect(0,0,600,400);
 
-ctx.fillStyle="#1f7a1f";
-trees.forEach(t=>{
-ctx.beginPath();
-ctx.arc(t.x,t.y,t.size,0,Math.PI*2);
-ctx.fill();
-});
+// レイキャスト
+for(let i=0;i<600;i++){
 
+let angle=player.angle + (i-300)*0.003;
+let rayX=player.x;
+let rayY=player.y;
+
+for(let j=0;j<20;j++){
+rayX+=Math.cos(angle)*0.05;
+rayY+=Math.sin(angle)*0.05;
+
+if(map[Math.floor(rayY)][Math.floor(rayX)]==1){
+
+let h=300/(j+1);
+
+// 壁
+ctx.fillStyle="green";
+ctx.fillRect(i,200-h/2,1,h);
+break;
+}
+}
+
+// 敵描画
+let dx=enemy.x-player.x;
+let dy=enemy.y-player.y;
+let angleToEnemy=Math.atan2(dy,dx)-player.angle;
+
+if(Math.abs(angleToEnemy)<0.5){
+
+let dist=Math.sqrt(dx*dx+dy*dy);
+let size=200/dist;
+
+let screenX=300+Math.tan(angleToEnemy)*300;
+
+// 顔っぽい描画
 ctx.fillStyle="white";
 ctx.beginPath();
-ctx.arc(player.x,player.y,player.size,0,Math.PI*2);
+ctx.arc(screenX,200,size/2,0,Math.PI*2);
 ctx.fill();
 
-ctx.fillStyle="red";
+ctx.fillStyle="black";
+// 目
 ctx.beginPath();
-ctx.arc(enemy.x,enemy.y,enemy.size,0,Math.PI*2);
+ctx.arc(screenX-10,190,5,0,Math.PI*2);
+ctx.arc(screenX+10,190,5,0,Math.PI*2);
 ctx.fill();
+
+// 口
+ctx.beginPath();
+ctx.arc(screenX,210,8,0,Math.PI);
+ctx.stroke();
+
+}
+}
+
+// ライト（中央だけ明るい）
+let g=ctx.createRadialGradient(300,200,50,300,200,300);
+g.addColorStop(0,"rgba(255,255,255,0.3)");
+g.addColorStop(1,"rgba(0,0,0,0.9)");
+
+ctx.fillStyle=g;
+ctx.fillRect(0,0,600,400);
 
 }
 
-function gameLoop(){
+function loop(){
 update();
 draw();
-requestAnimationFrame(gameLoop);
+requestAnimationFrame(loop);
 }
 
-gameLoop();
+loop();
 </script>
 
 </body>
